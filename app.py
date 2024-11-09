@@ -1,11 +1,21 @@
 from flask import Flask, request, jsonify
 import requests
 import uuid
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+cookies = os.getenv("COOKIES")
 
 app = Flask(__name__)
 
 FAKEYOU_INFERENCE_URL = "https://api.fakeyou.com/tts/inference"
 FAKEYOU_JOB_URL = "https://api.fakeyou.com/tts/job/"
+HEADERS = {
+    "content-type": "application/json",
+    "credentials": "include",
+    "cookie": f"session={cookies}"
+}
 
 @app.route('/api/tts', methods=['POST'])
 def tts_request():
@@ -21,7 +31,7 @@ def tts_request():
     }
 
     try:
-        response = requests.post(FAKEYOU_INFERENCE_URL, json=payload)
+        response = requests.post(FAKEYOU_INFERENCE_URL, json=payload, headers=HEADERS)
         response.raise_for_status()
         return jsonify(response.json())
     except requests.RequestException as e:
@@ -30,7 +40,7 @@ def tts_request():
 @app.route('/api/tts-status/<job_token>', methods=['GET'])
 def tts_status(job_token):
     try:
-        response = requests.get(f"{FAKEYOU_JOB_URL}{job_token}")
+        response = requests.get(f"{FAKEYOU_JOB_URL}{job_token}", headers=HEADERS)
         response.raise_for_status()
         return jsonify(response.json())
     except requests.RequestException as e:
