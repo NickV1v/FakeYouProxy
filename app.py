@@ -35,6 +35,7 @@ def tts_request():
         response.raise_for_status()
         return jsonify(response.json())
     except requests.RequestException as e:
+        print(f"TTS request err: {e}")
         return jsonify({"error": str(e)}), 500
 
 @app.route('/api/tts-status/<job_token>', methods=['GET'])
@@ -44,6 +45,7 @@ def tts_status(job_token):
         response.raise_for_status()
         return jsonify(response.json())
     except requests.RequestException as e:
+        print(f"Status poll err: {e}")
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
